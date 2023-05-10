@@ -1,20 +1,10 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, Button, Linking, Platform } from 'react-native';
 import * as Calendar from 'expo-calendar';
-import { useEffect, useState } from 'react';
-
-// export default function App() {
-//   return (
-//     <View style={styles.container}>
-//       <Text>Open up App.js to start working on your app!</Text>
-//       <StatusBar style="auto" />
-//     </View>
-//   );
-// }
 
 export default function App() {
   const [events, setEvents] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
     getCalendarEvents().then(setEvents);
@@ -22,28 +12,39 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      {events.map((event) => (
-        <Text key={event.id}>{event.title}</Text>
-      ))}
+      {selectedEvent ? (
+        <EventDetails event={selectedEvent} onBack={() => setSelectedEvent(null)} />
+      ) : (
+        events.map((event) => (
+          <Button key={event.id} title={event.title} onPress={() => setSelectedEvent(event)} />
+        ))
+      )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+function EventDetails({ event, onBack }) {
+  const openCalendarApp = () => {
+    const url = Platform.OS === 'ios' ? 'calshow://' : 'content://com.android.calendar/time/';
+    Linking.openURL(url);
+  };
 
+  return (
+    <View>
+      <Text>Title: {event.title}</Text>
+      <Text>Start: {new Date(event.startDate).toLocaleString()}</Text>
+      <Text>End: {new Date(event.endDate).toLocaleString()}</Text>
+      <Text>Location: {event.location || 'N/A'}</Text>
+      <Button title="Go back" onPress={onBack} />
+      <Button title="Open Calendar App" onPress={openCalendarApp} />
+    </View>
+  );
+}
 
 async function getCalendarEvents() {
   const { status } = await Calendar.requestCalendarPermissionsAsync();
 
   if (status === 'granted') {
-    // Fetch calendar events
     const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
     const startDate = new Date();
     const endDate = new Date(startDate);
@@ -55,10 +56,7 @@ async function getCalendarEvents() {
       endDate
     );
 
-    // Sort events by start date and time
     events.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-
-    // Return the first three events
     return events.slice(0, 3);
   } else {
     console.log('Calendar permission not granted');
@@ -66,8 +64,14 @@ async function getCalendarEvents() {
   }
 }
 
-
-
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 
 
 
