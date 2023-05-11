@@ -12,7 +12,10 @@ export default function App() {
   }, []);
 
   return (
-    
+    // make a nice header along with mapping each event to its own page 
+
+    // make use of a ternary conditional so it checks if select event is truthy if is then it means that Event details should be 
+    // rendered and if it is not it means that the code after the collon should be executed
     <View style={styles.container}>
       {selectedEvent ? (
         <EventDetails event={selectedEvent} onBack={() => setSelectedEvent(null)} />
@@ -21,6 +24,7 @@ export default function App() {
           <View style={styles.header}>
             <Text style={styles.upcomingEventsTitle}>Upcoming Events</Text>
           </View>
+          
           
           <View style={styles.container2}>
           {events.map((event) => (
@@ -51,7 +55,6 @@ export default function App() {
     </View>
   );
 }
-
 
 
 function EventDetails({ event, onBack }) {
@@ -141,6 +144,8 @@ async function getCalendarEvents() {
   }
 }
 
+
+// created different styles for all the boxes and words
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -163,7 +168,8 @@ const styles = StyleSheet.create({
   },
   eventBox: {
     backgroundColor: 'rgba(0, 150, 255, 1)',
-    width: 250,
+    width: 300,
+    height: 50, 
     borderRadius: 10,
     paddingHorizontal: 20,
     paddingVertical: 10,
@@ -173,6 +179,7 @@ const styles = StyleSheet.create({
   calendarButtonBox: {
     backgroundColor: 'rgba(210, 0 , 0, 1)',
     width: 400, 
+    heigth: 100,
     borderRadius: 10,
     paddingHorizontal: 20,
     paddingVertical: 10,
@@ -182,6 +189,7 @@ const styles = StyleSheet.create({
   eventText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: 'bold',
     textAlign: 'center',
   },
   eventDetailsText: {
